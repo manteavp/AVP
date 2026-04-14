@@ -1,69 +1,57 @@
-<!-- CAMBIOS CLAVE:
-1. Mejora visual (tipografía, sombras, spacing)
-2. Eliminado botón "Enviar" → envío automático al entrar al paso 3
-3. Pantalla final con contador + redirección simulada
--->
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Formulario</title>
 <style>
-  body { font-family: system-ui, -apple-system, sans-serif; background:#f7f7fb; }
-  .form-wrap { max-width: 520px; margin: 3rem auto; padding: 1.5rem; background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
-  .step { display:none; }
-  .step.active { display:block; }
-  .btn-primary { width:100%; padding:14px; background:#6C63FF; color:white; border:none; border-radius:10px; cursor:pointer; font-size:15px; }
-  .btn-primary:hover { opacity:.9; }
-  input { padding:12px; border-radius:10px; border:1px solid #ddd; }
-  .countdown { font-size:28px; font-weight:600; margin-top:10px; }
+  body { font-family: system-ui; background:#f5f6fa; }
+  .form-wrap { max-width:500px; margin:40px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);} 
+  input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; }
+  button { background:#6C63FF; color:white; border:none; cursor:pointer; }
+  .step{display:none;} .active{display:block;}
+  .count{font-size:28px;font-weight:bold;text-align:center;margin-top:10px;}
 </style>
+</head>
+<body>
 
 <div class="form-wrap">
 
-  <!-- STEP 1 -->
-  <div class="step active" id="s1">
-    <p><b>Nombre completo</b></p>
-    <input type="text" id="nombre" oninput="actualizarEmail()" />
-    <p><b>Email</b></p>
-    <input type="email" id="email" />
-    <button class="btn-primary" onclick="irA2()" id="btn1" disabled>Continuar</button>
-  </div>
+<div id="s1" class="step active">
+  <p>Nombre</p>
+  <input id="nombre" oninput="check()">
+  <p>Apellido</p>
+  <input id="apellido" oninput="check()">
+  <p>Email</p>
+  <input id="email">
+  <button onclick="irA(2)" id="btn1" disabled>Continuar</button>
+</div>
 
-  <!-- STEP 2 -->
-  <div class="step" id="s2">
-    <p><b>Área</b></p>
-    <button onclick="selArea('Mantenimiento General')">Mantenimiento</button>
-    <button onclick="selArea('Eléctrico')">Eléctrico</button>
-    <button class="btn-primary" onclick="irA3()" id="btn2" disabled>Continuar</button>
-  </div>
+<div id="s2" class="step">
+  <p>Área</p>
+  <button onclick="sel('Mantenimiento')">Mantenimiento</button>
+  <button onclick="sel('Eléctrico')">Eléctrico</button>
+  <button onclick="enviar()" id="btn2" disabled>Finalizar</button>
+</div>
 
-  <!-- STEP 3 -->
-  <div class="step" id="s3">
-    <p>Enviando email automáticamente...</p>
-    <div id="status"></div>
-  </div>
-
-  <!-- STEP 4 -->
-  <div class="step" id="s4">
-    <p><b>Dirigiendo a Play Store</b></p>
-    <p>Aquí vas a poder descargar la aplicación</p>
-    <div class="countdown" id="count">5</div>
-  </div>
+<div id="s3" class="step">
+  <p><b>Dirigiendo a Play Store</b></p>
+  <p>Aquí vas a poder descargar la aplicación</p>
+  <div class="count" id="count">5</div>
+</div>
 
 </div>
 
 <script>
-let areaSeleccionada='';
+let area='';
 
-function actualizarEmail(){
-  const val=document.getElementById('nombre').value.trim();
-  const parts=val.split(' ');
-  if(parts.length>=2){
-    document.getElementById('email').value = parts[0][0].toLowerCase()+parts[1].toLowerCase()+'@avpuertos.com';
+function check(){
+  const n=document.getElementById('nombre').value;
+  const a=document.getElementById('apellido').value;
+
+  if(n && a){
+    document.getElementById('email').value = n[0].toLowerCase()+a.toLowerCase()+'@avpuertos.com';
     document.getElementById('btn1').disabled=false;
   }
-}
-
-function selArea(a){
-  areaSeleccionada=a;
-  document.getElementById('btn2').disabled=false;
 }
 
 function irA(n){
@@ -71,38 +59,38 @@ function irA(n){
   document.getElementById('s'+n).classList.add('active');
 }
 
-function irA2(){ irA(2); }
+function sel(a){
+  area=a;
+  document.getElementById('btn2').disabled=false;
+}
 
-function irA3(){
+function enviar(){
+  const nombre=document.getElementById('nombre').value;
+  const apellido=document.getElementById('apellido').value;
+  const email=document.getElementById('email').value;
+
+  const subject=`Nuevo registro AppSheet - ${nombre} ${apellido}`;
+  const body=`Nombre: ${nombre}\nApellido: ${apellido}\nEmail: ${email}\nÁrea: ${area}`;
+
+  window.location.href=`mailto:mirco.moreyra72@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
   irA(3);
-  enviarEmail(); // AUTO ENVÍO
+  countdown();
 }
 
-async function enviarEmail(){
-  const status=document.getElementById('status');
-
-  try{
-    await new Promise(r=>setTimeout(r,1500)); // simulación
-    status.textContent='Email enviado correctamente';
-    setTimeout(()=>{
-      irA(4);
-      iniciarCountdown();
-    },1000);
-  }catch(e){
-    status.textContent='Error';
-  }
-}
-
-function iniciarCountdown(){
+function countdown(){
   let c=5;
   const el=document.getElementById('count');
-  const interval=setInterval(()=>{
+  const i=setInterval(()=>{
     c--;
     el.textContent=c;
     if(c===0){
-      clearInterval(interval);
+      clearInterval(i);
       window.location.href='https://play.google.com/store/apps/details?id=x1Trackmaster.x1Trackmaster&hl=es';
     }
   },1000);
 }
 </script>
+
+</body>
+</html>
