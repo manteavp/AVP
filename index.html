@@ -3,105 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <title>Formulario</title>
+
 <style>
   body { font-family: system-ui; background:#f5f6fa; }
-  .form-wrap { max-width:500px; margin:40px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);} 
-  input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; }
+  .form-wrap {
+    max-width:500px;
+    margin:40px auto;
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  input, button {
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:8px;
+    border:1px solid #ddd;
+  }
+
   button { cursor:pointer; }
-  .step{display:none;} .active{display:block;}
-  .count{font-size:28px;font-weight:bold;text-align:center;margin-top:10px;}
-  .area-btn{background:#e5e7eb;}
-  .area-btn.selected{background:#2563eb;color:#fff;}
+
+  .step { display:none; }
+  .active { display:block; }
+
+  .area-btn { background:#e5e7eb; }
+  .area-btn.selected { background:#2563eb; color:#fff; }
+
+  .count {
+    font-size:28px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:10px;
+  }
 </style>
 </head>
+
 <body>
 
 <div class="form-wrap">
 
-<div id="s1" class="step active">
-  <p>Nombre</p>
-  <input id="nombre" oninput="updateEmail()">
-  <p>Apellido</p>
-  <input id="apellido" oninput="updateEmail()">
-  <p>Email</p>
-  <input id="email" readonly>
-  <button onclick="irA(2)" id="btn1" disabled>Continuar</button>
-</div>
+  <!-- STEP 1 -->
+  <div id="s1" class="step active">
+    <p>Nombre</p>
+    <input id="nombre" oninput="updateEmail()">
 
-<div id="s2" class="step">
-  <p>Área</p>
-  <button class="area-btn" id="btn-mant" onclick="sel('Mantenimiento')">Mantenimiento</button>
-  <button class="area-btn" id="btn-elec" onclick="sel('Eléctrico')">Eléctrico</button>
-</div>
+    <p>Apellido</p>
+    <input id="apellido" oninput="updateEmail()">
 
-<div id="s3" class="step">
-  <p><b>Dirigiendo a Play Store</b></p>
-  <p>Aquí vas a poder descargar la aplicación</p>
-  <div class="count" id="count">5</div>
-</div>
+    <p>Email</p>
+    <input id="email" readonly>
+
+    <button onclick="irA(2)" id="btn1" disabled>Continuar</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="s2" class="step">
+    <p>Área</p>
+
+    <button class="area-btn" id="btn-mant" onclick="sel('Mantenimiento')">
+      Mantenimiento
+    </button>
+
+    <button class="area-btn" id="btn-elec" onclick="sel('Eléctrico')">
+      Eléctrico
+    </button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="s3" class="step">
+    <p><b>Dirigiendo a Play Store</b></p>
+    <p>Aquí vas a poder descargar la aplicación</p>
+    <div class="count" id="count">5</div>
+  </div>
 
 </div>
 
 <script>
-let area='';
+let area = '';
 
 function updateEmail(){
-  const nombre=document.getElementById('nombre').value.trim();
-  const apellido=document.getElementById('apellido').value.trim();
+  const nombre = document.getElementById('nombre').value.trim();
+  const apellido = document.getElementById('apellido').value.trim();
 
   if(nombre && apellido){
-    const email = nombre[0].toLowerCase()+apellido.toLowerCase()+'@avpuertos.com';
-    document.getElementById('email').value=email;
-    document.getElementById('btn1').disabled=false;
+    const email = nombre[0].toLowerCase() + apellido.toLowerCase() + '@avpuertos.com';
+    document.getElementById('email').value = email;
+    document.getElementById('btn1').disabled = false;
   } else {
-    document.getElementById('btn1').disabled=true;
+    document.getElementById('btn1').disabled = true;
   }
 }
 
 function irA(n){
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('s'+n).classList.add('active');
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
 }
 
 function sel(a){
-  area=a;
+  area = a;
 
   document.getElementById('btn-mant').classList.remove('selected');
   document.getElementById('btn-elec').classList.remove('selected');
 
-  if(a==='Mantenimiento') document.getElementById('btn-mant').classList.add('selected');
-  if(a==='Eléctrico') document.getElementById('btn-elec').classList.add('selected');
+  if(a === 'Mantenimiento') document.getElementById('btn-mant').classList.add('selected');
+  if(a === 'Eléctrico') document.getElementById('btn-elec').classList.add('selected');
 
-  setTimeout(enviar,300);
+  setTimeout(enviar, 300);
 }
 
 async function enviar(){
-  const nombre=document.getElementById('nombre').value;
-  const apellido=document.getElementById('apellido').value;
-  const email=document.getElementById('email').value;
+  const nombre = document.getElementById('nombre').value;
+  const apellido = document.getElementById('apellido').value;
+  const email = document.getElementById('email').value;
 
-  try{
-    await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec",{
-      method:"POST",
-      body: JSON.stringify({nombre,apellido,email,area})
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nombre,
+        apellido,
+        email,
+        area
+      })
     });
-  }catch(e){}
+  } catch (e) {
+    console.log("Error envío:", e);
+  }
 
   irA(3);
   countdown();
 }
 
 function countdown(){
-  let c=5;
-  const el=document.getElementById('count');
-  const i=setInterval(()=>{
+  let c = 5;
+  const el = document.getElementById('count');
+
+  const i = setInterval(() => {
     c--;
-    el.textContent=c;
-    if(c===0){
+    el.textContent = c;
+
+    if(c === 0){
       clearInterval(i);
-      window.location.href='https://play.google.com/store/apps/details?id=x1Trackmaster.x1Trackmaster&hl=es';
+      window.location.href = "https://play.google.com/store/apps/details?id=x1Trackmaster.x1Trackmaster&hl=es";
     }
-  },1000);
+  }, 1000);
 }
 </script>
 
