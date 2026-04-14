@@ -2,158 +2,690 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Formulario</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Empleado</title>
 <style>
-  body { font-family: system-ui; background:#f5f6fa; }
-  .form-wrap {
-    max-width:500px;
-    margin:40px auto;
-    background:#fff;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f0f2f7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
   }
 
-  input, button {
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    border-radius:8px;
-    border:1px solid #ddd;
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    width: 100%;
+    max-width: 460px;
+    overflow: hidden;
   }
 
-  button { cursor:pointer; }
+  .card-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    padding: 28px 32px 24px;
+    color: #fff;
+  }
 
-  .step { display:none; }
-  .active { display:block; }
+  .card-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
 
-  .area-btn { background:#e5e7eb; }
-  .area-btn.selected { background:#2563eb; color:#fff; }
+  .card-header .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  .count {
-    font-size:28px;
-    font-weight:bold;
-    text-align:center;
-    margin-top:10px;
+  .card-header .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+
+  .card-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .card-header p {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .progress-bar span {
+    height: 4px;
+    flex: 1;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.25);
+    transition: background 0.4s;
+  }
+
+  .progress-bar span.done { background: #fff; }
+
+  .card-body { padding: 28px 32px 32px; }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 6px;
+  }
+
+  .step-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+  }
+
+  .field { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: #111827;
+    background: #f9fafb;
+  }
+
+  input[type="text"]:focus, input[type="email"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    background: #fff;
+  }
+
+  input[readonly] {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+  .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+  .btn-primary:disabled { background: #c7d2fe; cursor: not-allowed; }
+
+  .area-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .area-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    background: #fff;
+  }
+
+  .area-card:hover { border-color: #93c5fd; background: #eff6ff; }
+  .area-card:active { transform: scale(0.97); }
+
+  .area-card.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+
+  .area-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .area-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .area-card.selected .area-name { color: #1d4ed8; }
+
+  .sending-state {
+    text-align: center;
+    padding: 12px 0 4px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .redirect-box {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .redirect-box .check {
+    width: 52px;
+    height: 52px;
+    background: #16a34a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+
+  .redirect-box .check svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .redirect-box h3 { font-size: 17px; font-weight: 700; color: #14532d; margin-bottom: 6px; }
+  .redirect-box p { font-size: 14px; color: #16a34a; }
+
+  .countdown-ring {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin: 16px auto 0;
+  }
+
+  .countdown-ring svg { transform: rotate(-90deg); }
+
+  .countdown-ring circle {
+    fill: none;
+    stroke-width: 4;
+  }
+
+  .ring-bg { stroke: #bbf7d0; }
+  .ring-fill { stroke: #16a34a; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+
+  .countdown-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #14532d;
+  }
+
+  /* ── INTRO SCREEN ── */
+  .intro-wrap {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .intro-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 20px 20px 0 0;
+    padding: 32px 32px 28px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .intro-hero .app-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 30px;
+  }
+
+  .intro-hero h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .intro-hero p {
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  .intro-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    margin-bottom: 14px;
+  }
+
+  .intro-steps {
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+    padding: 28px 28px 32px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  }
+
+  .intro-steps-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .steps-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step-row {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .step-num.n1 { background: #eff6ff; color: #2563eb; }
+  .step-num.n2 { background: #f0fdf4; color: #16a34a; }
+  .step-num.n3 { background: #fdf4ff; color: #9333ea; }
+
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    margin: 4px 0;
+    border-radius: 99px;
+  }
+
+  .step-line.l1 { background: linear-gradient(to bottom, #bfdbfe, #bbf7d0); }
+  .step-line.l2 { background: linear-gradient(to bottom, #bbf7d0, #e9d5ff); }
+
+  .step-content {
+    padding: 8px 0 24px;
+    flex: 1;
+  }
+
+  .step-row:last-child .step-content { padding-bottom: 4px; }
+
+  .step-content-inner {
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .step-emoji { font-size: 24px; flex-shrink: 0; }
+
+  .step-text h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .step-text p {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .intro-cta {
+    width: 100%;
+    padding: 14px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: -0.2px;
+  }
+
+  .intro-cta:hover { background: #1d4ed8; }
+  .intro-cta:active { transform: scale(0.98); }
+
+  .store-note {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
   }
 </style>
 </head>
-
 <body>
 
-<div class="form-wrap">
+<!-- INTRO SCREEN -->
+<div class="intro-wrap" id="intro">
+  <div class="intro-hero">
+    <div class="app-icon">🔧</div>
+    <div class="intro-badge">App de Mantenimiento</div>
+    <h1>Estás a 3 pasos de ingresar</h1>
+    <p>Completá el registro rápido para descargar la app y empezar a trabajar</p>
+  </div>
+  <div class="intro-steps">
+    <div class="intro-steps-label">¿Cómo funciona?</div>
+    <div class="steps-timeline">
 
-  <!-- STEP 1 -->
-  <div id="s1" class="step active">
-    <p>Nombre</p>
-    <input id="nombre" oninput="updateEmail()">
+      <div class="step-row">
+        <div class="step-left">
+          <div class="step-num n1">1</div>
+          <div class="step-line l1"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-content-inner">
+            <span class="step-emoji">👤</span>
+            <div class="step-text">
+              <h3>Ingresá tus datos</h3>
+              <p>Nombre y apellido para generar tu email corporativo automáticamente</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <p>Apellido</p>
-    <input id="apellido" oninput="updateEmail()">
+      <div class="step-row">
+        <div class="step-left">
+          <div class="step-num n2">2</div>
+          <div class="step-line l2"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-content-inner">
+            <span class="step-emoji">🏭</span>
+            <div class="step-text">
+              <h3>Seleccioná tu área</h3>
+              <p>Elegí entre Mantenimiento o Eléctrico según tu sector</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <p>Email</p>
-    <input id="email" readonly>
+      <div class="step-row">
+        <div class="step-left">
+          <div class="step-num n3">3</div>
+        </div>
+        <div class="step-content">
+          <div class="step-content-inner">
+            <span class="step-emoji">📲</span>
+            <div class="step-text">
+              <h3>Descargá la app</h3>
+              <p>Te redirigimos a Play Store para instalar la aplicación</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <button onclick="irA(2)" id="btn1" disabled>Continuar</button>
+    </div>
+
+    <button class="intro-cta" onclick="mostrarFormulario()">¡Empezar ahora! →</button>
+    <div class="store-note">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Tus datos se guardan de forma segura
+    </div>
+  </div>
+</div>
+
+<!-- FORM CARD -->
+<div class="card" id="formcard" style="display:none;">
+  <div class="card-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:0.04em;">AV PUERTOS</div>
+        <div style="font-size:11px;opacity:0.65;">Portal de empleados</div>
+      </div>
+    </div>
+    <h1 id="header-title">Registro de empleado</h1>
+    <p id="header-sub">Completá tus datos para continuar</p>
+    <div class="progress-bar">
+      <span id="p1" class="done"></span>
+      <span id="p2"></span>
+      <span id="p3"></span>
+    </div>
   </div>
 
-  <!-- STEP 2 -->
-  <div id="s2" class="step">
-    <p>Área</p>
+  <div class="card-body">
 
-    <button class="area-btn" id="btn-mant" onclick="sel('Mantenimiento')">
-      Mantenimiento
-    </button>
+    <!-- PASO 1 -->
+    <div id="s1" class="step active">
+      <div class="step-label">Paso 1 de 3</div>
+      <div class="step-title">¿Quién sos?</div>
+      <div class="field">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" placeholder="Ej: Juan" oninput="updateEmail()">
+      </div>
+      <div class="field">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" placeholder="Ej: García" oninput="updateEmail()">
+      </div>
+      <div class="field">
+        <label>Email corporativo (generado)</label>
+        <input type="email" id="email" readonly placeholder="nombre@avpuertos.com">
+      </div>
+      <button class="btn-primary" onclick="irA(2)" id="btn1" disabled>Continuar →</button>
+    </div>
 
-    <button class="area-btn" id="btn-elec" onclick="sel('Eléctrico')">
-      Eléctrico
-    </button>
+    <!-- PASO 2 -->
+    <div id="s2" class="step">
+      <div class="step-label">Paso 2 de 3</div>
+      <div class="step-title">¿En qué área trabajás?</div>
+      <div class="area-grid">
+        <div class="area-card" id="card-mant" onclick="sel('Mantenimiento')">
+          <span class="area-icon">🔧</span>
+          <div class="area-name">Mantenimiento</div>
+        </div>
+        <div class="area-card" id="card-elec" onclick="sel('Eléctrico')">
+          <span class="area-icon">⚡</span>
+          <div class="area-name">Eléctrico</div>
+        </div>
+      </div>
+      <div id="sending-msg" class="sending-state" style="display:none;">
+        <div class="spinner"></div>
+        <p style="font-size:14px;color:#6b7280;">Registrando datos...</p>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div id="s3" class="step">
+      <div class="redirect-box">
+        <div class="check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h3>¡Registro exitoso!</h3>
+        <p>Redirigiendo a Play Store...</p>
+        <div class="countdown-ring">
+          <svg viewBox="0 0 64 64" width="64" height="64">
+            <circle class="ring-bg" cx="32" cy="32" r="28"/>
+            <circle class="ring-fill" id="ring" cx="32" cy="32" r="28"
+              stroke-dasharray="175.93"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="countdown-num" id="count">5</div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  <!-- STEP 3 -->
-  <div id="s3" class="step">
-    <p><b>Dirigiendo a Play Store</b></p>
-    <p>Aquí vas a poder descargar la aplicación</p>
-    <div class="count" id="count">5</div>
-  </div>
-
 </div>
 
 <script>
 let area = '';
+const DASHARRAY = 175.93;
 
-function updateEmail(){
+function mostrarFormulario() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('formcard').style.display = 'block';
+}
+
+const headers = [
+  { title: 'Registro de empleado', sub: 'Completá tus datos para continuar' },
+  { title: 'Seleccioná tu área', sub: 'Elegí el sector donde trabajás' },
+  { title: '¡Ya casi!', sub: 'Tu registro fue enviado correctamente' }
+];
+
+function updateEmail() {
   const nombre = document.getElementById('nombre').value.trim();
   const apellido = document.getElementById('apellido').value.trim();
-
-  if(nombre && apellido){
+  if (nombre && apellido) {
     const email = nombre[0].toLowerCase() + apellido.toLowerCase() + '@avpuertos.com';
     document.getElementById('email').value = email;
     document.getElementById('btn1').disabled = false;
   } else {
+    document.getElementById('email').value = '';
     document.getElementById('btn1').disabled = true;
   }
 }
 
-function irA(n){
+function irA(n) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('s' + n).classList.add('active');
+  ['p1','p2','p3'].forEach((id, i) => {
+    document.getElementById(id).classList.toggle('done', i < n);
+  });
+  const h = headers[n - 1];
+  document.getElementById('header-title').textContent = h.title;
+  document.getElementById('header-sub').textContent = h.sub;
 }
 
-function sel(a){
+function sel(a) {
   area = a;
-
-  document.getElementById('btn-mant').classList.remove('selected');
-  document.getElementById('btn-elec').classList.remove('selected');
-
-  if(a === 'Mantenimiento') document.getElementById('btn-mant').classList.add('selected');
-  if(a === 'Eléctrico') document.getElementById('btn-elec').classList.add('selected');
-
-  setTimeout(enviar, 300);
+  document.getElementById('card-mant').classList.remove('selected');
+  document.getElementById('card-elec').classList.remove('selected');
+  document.getElementById('card-' + (a === 'Mantenimiento' ? 'mant' : 'elec')).classList.add('selected');
+  document.getElementById('sending-msg').style.display = 'block';
+  setTimeout(enviar, 600);
 }
 
-async function enviar(){
+async function enviar() {
   const nombre = document.getElementById('nombre').value;
   const apellido = document.getElementById('apellido').value;
   const email = document.getElementById('email').value;
 
+  const payload = { nombre, apellido, email, area, notificar: 'mirco.mroeyra72@gmail.com' };
+
   try {
-    await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        nombre,
-        apellido,
-        email,
-        area
-      })
-    });
+    await fetch(
+      "https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
   } catch (e) {
-    console.log("Error envío:", e);
+    console.log("Error de envío:", e);
   }
 
   irA(3);
   countdown();
 }
 
-function countdown(){
+function countdown() {
   let c = 5;
   const el = document.getElementById('count');
+  const ring = document.getElementById('ring');
+  ring.style.strokeDashoffset = 0;
 
-  const i = setInterval(() => {
+  const interval = setInterval(() => {
     c--;
     el.textContent = c;
-
-    if(c === 0){
-      clearInterval(i);
+    ring.style.strokeDashoffset = DASHARRAY * (1 - c / 5);
+    if (c === 0) {
+      clearInterval(interval);
       window.location.href = "https://play.google.com/store/apps/details?id=x1Trackmaster.x1Trackmaster&hl=es";
     }
   }, 1000);
 }
 </script>
-
 </body>
 </html>
