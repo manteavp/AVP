@@ -7,11 +7,11 @@
   body { font-family: system-ui; background:#f5f6fa; }
   .form-wrap { max-width:500px; margin:40px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);} 
   input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; }
-  button { background:#e5e7eb; color:#111; border:none; cursor:pointer; }
-  .area-btn { margin-top:10px; }
-  .area-btn.selected { background:#2563eb; color:white; }
+  button { cursor:pointer; }
   .step{display:none;} .active{display:block;}
   .count{font-size:28px;font-weight:bold;text-align:center;margin-top:10px;}
+  .area-btn{background:#e5e7eb;}
+  .area-btn.selected{background:#2563eb;color:#fff;}
 </style>
 </head>
 <body>
@@ -20,11 +20,11 @@
 
 <div id="s1" class="step active">
   <p>Nombre</p>
-  <input id="nombre" oninput="check()">
+  <input id="nombre" oninput="updateEmail()">
   <p>Apellido</p>
-  <input id="apellido" oninput="check()">
+  <input id="apellido" oninput="updateEmail()">
   <p>Email</p>
-  <input id="email">
+  <input id="email" readonly>
   <button onclick="irA(2)" id="btn1" disabled>Continuar</button>
 </div>
 
@@ -32,7 +32,6 @@
   <p>Área</p>
   <button class="area-btn" id="btn-mant" onclick="sel('Mantenimiento')">Mantenimiento</button>
   <button class="area-btn" id="btn-elec" onclick="sel('Eléctrico')">Eléctrico</button>
-  
 </div>
 
 <div id="s3" class="step">
@@ -46,13 +45,16 @@
 <script>
 let area='';
 
-function check(){
-  const n=document.getElementById('nombre').value;
-  const a=document.getElementById('apellido').value;
+function updateEmail(){
+  const nombre=document.getElementById('nombre').value.trim();
+  const apellido=document.getElementById('apellido').value.trim();
 
-  if(n && a){
-    document.getElementById('email').value = n[0].toLowerCase()+a.toLowerCase()+'@avpuertos.com';
+  if(nombre && apellido){
+    const email = nombre[0].toLowerCase()+apellido.toLowerCase()+'@avpuertos.com';
+    document.getElementById('email').value=email;
     document.getElementById('btn1').disabled=false;
+  } else {
+    document.getElementById('btn1').disabled=true;
   }
 }
 
@@ -70,7 +72,7 @@ function sel(a){
   if(a==='Mantenimiento') document.getElementById('btn-mant').classList.add('selected');
   if(a==='Eléctrico') document.getElementById('btn-elec').classList.add('selected');
 
-  setTimeout(()=>enviar(),300);
+  setTimeout(enviar,300);
 }
 
 async function enviar(){
@@ -78,22 +80,12 @@ async function enviar(){
   const apellido=document.getElementById('apellido').value;
   const email=document.getElementById('email').value;
 
-  await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec",{
-    method:"POST",
-    body: JSON.stringify({
-      nombre,
-      apellido,
-      email,
-      area
-    })
-  });
-
-  irA(3);
-  countdown();
-} ${apellido}`;
-  const body=`Nombre: ${nombre}\nApellido: ${apellido}\nEmail: ${email}\nÁrea: ${area}`;
-
-  window.location.href=`mailto:mirco.moreyra72@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  try{
+    await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec",{
+      method:"POST",
+      body: JSON.stringify({nombre,apellido,email,area})
+    });
+  }catch(e){}
 
   irA(3);
   countdown();
