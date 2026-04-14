@@ -1,0 +1,229 @@
+
+<style>
+  .form-wrap { max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .field-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.02em; }
+  .field-hint { font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px; }
+  .area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .area-btn { padding: 14px 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; }
+  .area-btn.selected { border: 1.5px solid #7F77DD; background: #EEEDFE; color: #3C3489; }
+  .area-btn:hover:not(.selected) { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+  .code-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px 16px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre-wrap; word-break: break-all; line-height: 1.6; margin-bottom: 12px; }
+  .btn-primary { width: 100%; padding: 12px; background: #7F77DD; color: white; border: none; border-radius: var(--border-radius-md); font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 20px; transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-secondary { width: 100%; padding: 11px; background: transparent; color: var(--color-text-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
+  .btn-secondary:hover { background: var(--color-background-secondary); }
+  .progress-bar { height: 3px; background: var(--color-background-secondary); border-radius: 2px; margin-bottom: 2rem; }
+  .progress-fill { height: 100%; border-radius: 2px; background: #7F77DD; transition: width 0.3s ease; }
+  .step-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 6px; }
+  .success-icon { width: 48px; height: 48px; border-radius: 50%; background: #EAF3DE; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .success-icon svg { width: 24px; height: 24px; }
+  .status-msg { font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; text-align: center; min-height: 18px; }
+  .copy-btn { font-size: 12px; color: #534AB7; background: none; border: none; cursor: pointer; padding: 0; float: right; }
+  .copy-btn:hover { text-decoration: underline; }
+</style>
+
+<div class="form-wrap">
+  <h2 class="sr-only">Formulario de registro para código AppSheet - AVPuertos</h2>
+
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:33%"></div></div>
+
+  <!-- STEP 1: Nombre -->
+  <div class="step active" id="s1">
+    <div class="step-label">Paso 1 de 3</div>
+    <p style="font-size:20px;font-weight:500;margin:0 0 6px;">¿Cuál es tu nombre completo?</p>
+    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;">Se usará para generar tu código de acceso AppSheet.</p>
+    <div class="field-label">Nombre completo</div>
+    <input type="text" id="nombre" placeholder="Ej: Juan Pérez" oninput="actualizarEmail()" style="width:100%;box-sizing:border-box;" />
+    <div style="margin-top:16px;">
+      <div class="field-label">Email institucional <button class="copy-btn" onclick="copiarEmail()">copiar</button></div>
+      <input type="email" id="email" placeholder="Se completará automáticamente" style="width:100%;box-sizing:border-box;" />
+      <div class="field-hint">Primera letra del nombre + apellido @avpuertos.com — podés editarlo si es distinto.</div>
+    </div>
+    <button class="btn-primary" onclick="irA2()" id="btn1" disabled>Continuar</button>
+  </div>
+
+  <!-- STEP 2: Área -->
+  <div class="step" id="s2">
+    <div class="step-label">Paso 2 de 3</div>
+    <p style="font-size:20px;font-weight:500;margin:0 0 6px;">¿En qué área trabajás?</p>
+    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;">Seleccioná tu área de pertenencia.</p>
+    <div class="area-grid">
+      <button class="area-btn" id="area-mg" onclick="selArea('Mantenimiento General')">
+        <div style="font-size:22px;margin-bottom:6px;">🔧</div>
+        Mantenimiento<br>General
+      </button>
+      <button class="area-btn" id="area-el" onclick="selArea('Eléctrico')">
+        <div style="font-size:22px;margin-bottom:6px;">⚡</div>
+        Eléctrico
+      </button>
+    </div>
+    <button class="btn-primary" onclick="irA3()" id="btn2" disabled>Continuar</button>
+    <button class="btn-secondary" onclick="irA(1)">Volver</button>
+  </div>
+
+  <!-- STEP 3: Código generado -->
+  <div class="step" id="s3">
+    <div class="step-label">Paso 3 de 3</div>
+    <p style="font-size:20px;font-weight:500;margin:0 0 6px;">Tu código AppSheet</p>
+    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 16px;">Confirmá los datos y enviá el código por email.</p>
+
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:16px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--color-text-secondary);">Nombre</span><span id="res-nombre" style="font-weight:500;"></span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--color-text-secondary);">Email</span><span id="res-email" style="color:#534AB7;"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-secondary);">Área</span><span id="res-area" style="font-weight:500;"></span></div>
+    </div>
+
+    <div class="field-label">Código generado <button class="copy-btn" onclick="copiarCodigo()">copiar código</button></div>
+    <div class="code-box" id="codigo-box"></div>
+
+    <button class="btn-primary" onclick="enviarEmail()" id="btnEnviar">Enviar por email</button>
+    <button class="btn-secondary" onclick="irA(2)">Volver</button>
+    <div class="status-msg" id="status"></div>
+  </div>
+
+  <!-- STEP 4: Éxito -->
+  <div class="step" id="s4">
+    <div style="text-align:center;padding:2rem 0;">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p style="font-size:20px;font-weight:500;margin:0 0 8px;">¡Enviado con éxito!</p>
+      <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 24px;">El código fue enviado a<br><strong>mirco.moreyra72@gmail.com</strong></p>
+      <div class="code-box" id="codigo-final" style="text-align:left;"></div>
+      <button class="btn-secondary" onclick="reiniciar()" style="margin-top:8px;">Completar otro registro</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let areaSeleccionada = '';
+
+function normalizarTexto(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function actualizarEmail() {
+  const val = document.getElementById('nombre').value.trim();
+  const parts = val.split(/\s+/);
+  if (parts.length >= 2) {
+    const inicial = normalizarTexto(parts[0])[0];
+    const apellido = normalizarTexto(parts[parts.length - 1]);
+    document.getElementById('email').value = inicial + apellido + '@avpuertos.com';
+  } else {
+    document.getElementById('email').value = '';
+  }
+  document.getElementById('btn1').disabled = val.length < 3;
+}
+
+function copiarEmail() {
+  const e = document.getElementById('email').value;
+  if (e) navigator.clipboard.writeText(e);
+}
+
+function selArea(area) {
+  areaSeleccionada = area;
+  document.getElementById('area-mg').classList.remove('selected');
+  document.getElementById('area-el').classList.remove('selected');
+  if (area === 'Mantenimiento General') document.getElementById('area-mg').classList.add('selected');
+  else document.getElementById('area-el').classList.add('selected');
+  document.getElementById('btn2').disabled = false;
+}
+
+function irA(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
+  const pcts = { 1: '33%', 2: '66%', 3: '100%', 4: '100%' };
+  document.getElementById('prog').style.width = pcts[n] || '33%';
+}
+
+function irA2() {
+  if (document.getElementById('nombre').value.trim().length < 3) return;
+  irA(2);
+}
+
+function irA3() {
+  if (!areaSeleccionada) return;
+  const nombre = document.getElementById('nombre').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  document.getElementById('res-nombre').textContent = nombre;
+  document.getElementById('res-email').textContent = email;
+  document.getElementById('res-area').textContent = areaSeleccionada;
+
+  const col = areaSeleccionada === 'Eléctrico' ? 'Colaborador' : 'Técnico';
+  const codigo = `AND([${col}]="${nombre}",USEREMAIL()="${email}"),\nAND([Colaborador]="${nombre}",USEREMAIL()="${email}")`;
+  document.getElementById('codigo-box').textContent = codigo;
+  irA(3);
+}
+
+function copiarCodigo() {
+  const txt = document.getElementById('codigo-box').textContent;
+  navigator.clipboard.writeText(txt);
+}
+
+async function enviarEmail() {
+  const btn = document.getElementById('btnEnviar');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+  status.textContent = '';
+
+  const nombre = document.getElementById('res-nombre').textContent;
+  const email = document.getElementById('res-email').textContent;
+  const area = document.getElementById('res-area').textContent;
+  const codigo = document.getElementById('codigo-box').textContent;
+
+  const prompt = `Redactá un email de notificación interna en español, profesional y breve (máximo 100 palabras), para notificar un nuevo registro en AppSheet. Datos:
+- Nombre: ${nombre}
+- Email: ${email}
+- Área: ${area}
+- Código AppSheet generado:
+${codigo}
+- Link AppSheet: https://www.appsheet.com
+
+El email debe tener:
+Asunto: Nuevo registro AppSheet - ${nombre}
+Cuerpo: mencionar nombre, área, el código tal cual (en bloque), y el link al final.
+Firma: Sistema de Registro Automático - AVPuertos
+
+Respondé SOLO con el texto del email listo para enviar, sin explicaciones.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const emailBody = data.content.map(i => i.text || '').join('');
+
+    document.getElementById('codigo-final').textContent = codigo;
+    irA(4);
+  } catch (err) {
+    status.textContent = 'Error al procesar. Intentá de nuevo.';
+    btn.disabled = false;
+    btn.textContent = 'Enviar por email';
+  }
+}
+
+function reiniciar() {
+  document.getElementById('nombre').value = '';
+  document.getElementById('email').value = '';
+  areaSeleccionada = '';
+  document.getElementById('area-mg').classList.remove('selected');
+  document.getElementById('area-el').classList.remove('selected');
+  document.getElementById('btn1').disabled = true;
+  document.getElementById('btn2').disabled = true;
+  document.getElementById('btnEnviar').disabled = false;
+  document.getElementById('btnEnviar').textContent = 'Enviar por email';
+  document.getElementById('status').textContent = '';
+  irA(1);
+}
+</script>
