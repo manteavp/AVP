@@ -7,7 +7,9 @@
   body { font-family: system-ui; background:#f5f6fa; }
   .form-wrap { max-width:500px; margin:40px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);} 
   input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; }
-  button { background:#6C63FF; color:white; border:none; cursor:pointer; }
+  button { background:#e5e7eb; color:#111; border:none; cursor:pointer; }
+  .area-btn { margin-top:10px; }
+  .area-btn.selected { background:#2563eb; color:white; }
   .step{display:none;} .active{display:block;}
   .count{font-size:28px;font-weight:bold;text-align:center;margin-top:10px;}
 </style>
@@ -28,9 +30,9 @@
 
 <div id="s2" class="step">
   <p>Área</p>
-  <button onclick="sel('Mantenimiento')">Mantenimiento</button>
-  <button onclick="sel('Eléctrico')">Eléctrico</button>
-  <button onclick="enviar()" id="btn2" disabled>Finalizar</button>
+  <button class="area-btn" id="btn-mant" onclick="sel('Mantenimiento')">Mantenimiento</button>
+  <button class="area-btn" id="btn-elec" onclick="sel('Eléctrico')">Eléctrico</button>
+  
 </div>
 
 <div id="s3" class="step">
@@ -61,15 +63,34 @@ function irA(n){
 
 function sel(a){
   area=a;
-  document.getElementById('btn2').disabled=false;
+
+  document.getElementById('btn-mant').classList.remove('selected');
+  document.getElementById('btn-elec').classList.remove('selected');
+
+  if(a==='Mantenimiento') document.getElementById('btn-mant').classList.add('selected');
+  if(a==='Eléctrico') document.getElementById('btn-elec').classList.add('selected');
+
+  setTimeout(()=>enviar(),300);
 }
 
-function enviar(){
+async function enviar(){
   const nombre=document.getElementById('nombre').value;
   const apellido=document.getElementById('apellido').value;
   const email=document.getElementById('email').value;
 
-  const subject=`Nuevo registro AppSheet - ${nombre} ${apellido}`;
+  await fetch("https://script.google.com/macros/s/AKfycby70IiiSG3uzteaBB39wZKbnSL_JNRxmMVu7PuhGXxMl1z5hsX7gh96p5F4kGuOf2yHbw/exec",{
+    method:"POST",
+    body: JSON.stringify({
+      nombre,
+      apellido,
+      email,
+      area
+    })
+  });
+
+  irA(3);
+  countdown();
+} ${apellido}`;
   const body=`Nombre: ${nombre}\nApellido: ${apellido}\nEmail: ${email}\nÁrea: ${area}`;
 
   window.location.href=`mailto:mirco.moreyra72@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
